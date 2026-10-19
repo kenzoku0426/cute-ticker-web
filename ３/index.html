@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ふわふわチェックテロップメーカー</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+	background: #fff3f9;
+	color: #913b69;
+	padding: 25px;
+}
+.panel {
+	max-width: 750px;
+	margin: auto;
+	padding: 25px;
+	background: white;
+	border: 2px solid #f4b4d1;
+	border-radius: 20px;
+}
+h1 { text-align: center; }
+label {
+	display: block;
+	margin: 18px 0 8px;
+	font-weight: bold;
+}
+input, select {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #f4b4d1;
+	border-radius: 8px;
+	font-size: 16px;
+}
+button {
+	width: 100%;
+	padding: 15px;
+	margin-top: 20px;
+	border: 0;
+	border-radius: 12px;
+	background: #e98ab5;
+	color: white;
+	font-size: 18px;
+	font-weight: bold;
+	cursor: pointer;
+}
+#result {
+	overflow-wrap: anywhere;
+	margin-top: 15px;
+	font-size: 13px;
+}
+</style>
+</head>
+<body>
+
+<div class="panel">
+<h1>🎀 ふわふわチェックテロップ</h1>
+<p>配信画面の下に流れるテロップを作ろう！</p>
+
+<label>流れる文章</label>
+<input id="text" maxlength="300"
+ value="初見さん大歓迎！ ♡ コメント・フォローよろしくお願いします！">
+
+<label>見出し</label>
+<input id="label" maxlength="40" value="🎀 おしらせ">
+
+<label>文字サイズ</label>
+<input id="size" type="range" min="24" max="48" value="32">
+<span id="sizeValue">32px</span>
+
+<label>チェック柄の色</label>
+<select id="color">
+<option value="#f4b4d1">淡いピンク</option>
+<option value="#ee92bd">いちごピンク</option>
+<option value="#d5b2ef">ラベンダー</option>
+</select>
+
+<label>スクロール時間</label>
+<input id="speed" type="range" min="5" max="40" value="15">
+<span id="speedValue">15秒</span>
+
+<h3>プレビュー</h3>
+<div class="ticker" id="preview">
+	<div class="label" id="previewLabel">🎀 おしらせ</div>
+	<div class="area">
+		<div class="message" id="previewMessage"></div>
+	</div>
+</div>
+
+<button id="copy">♡ OBS用URLをコピー ♡</button>
+<button id="open">プレビューを別タブで開く</button>
+<p id="result"></p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function getUrl() {
+	const url = new URL("ticker.html", location.href);
+	url.searchParams.set("text", $("text").value);
+	url.searchParams.set("label", $("label").value);
+	url.searchParams.set("size", $("size").value);
+	url.searchParams.set("color", $("color").value);
+	url.searchParams.set("speed", $("speed").value);
+	return url.href;
+}
+
+function update() {
+	$("previewMessage").textContent = $("text").value;
+	$("previewLabel").textContent = $("label").value;
+
+	$("preview").style.setProperty(
+		"--size", $("size").value + "px");
+	$("preview").style.setProperty(
+		"--pink", $("color").value);
+	$("preview").style.setProperty(
+		"--speed", $("speed").value + "s");
+
+	$("sizeValue").textContent = $("size").value + "px";
+	$("speedValue").textContent = $("speed").value + "秒";
+}
+
+document.querySelectorAll("input, select")
+	.forEach(el => el.addEventListener("input", update));
+
+$("copy").addEventListener("click", async () => {
+	const url = getUrl();
+
+	if (location.protocol === "file:") {
+		$("result").textContent =
+			"GitHub Pagesに公開してからURLをコピーしてください。";
+		return;
+	}
+
+	try {
+		await navigator.clipboard.writeText(url);
+		$("result").textContent = "コピーできました！";
+	} catch {
+		$("result").textContent =
+			"コピーできない場合は、このURLを選択してコピーしてください： " + url;
+	}
+});
+
+$("open").addEventListener("click", () => {
+	window.open(getUrl(), "_blank", "noopener");
+});
+
+update();
+</script>
+</body>
+</html>
