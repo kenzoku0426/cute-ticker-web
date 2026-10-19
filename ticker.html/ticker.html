@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>羽川配信テロップ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="obs">
+
+<div class="ticker" id="ticker">
+	<div class="label" id="label">🦇おしらせ🍼</div>
+	<div class="area">
+		<div class="message" id="message">
+			♡羽川ういオリジナルクッキー初回限定版が発売中♡詳細は、ういのX固定ポストから！
+		</div>
+	</div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+
+const message = params.get("text") ||
+	"♡羽川ういオリジナルクッキー初回限定版が発売中♡詳細は、ういのX固定ポストから！";
+
+const label = params.get("label") || "🦇おしらせ🍼";
+
+const size = Math.min(48,
+	Math.max(24, Number(params.get("size")) || 32));
+
+const speed = Math.min(40,
+	Math.max(5, Number(params.get("speed")) || 15));
+
+const rawColor = params.get("color") || "#f4b4d1";
+const color = /^#[0-9a-fA-F]{6}$/.test(rawColor)
+	? rawColor : "#f4b4d1";
+
+document.getElementById("message").textContent =
+	message.slice(0, 300);
+document.getElementById("label").textContent =
+	label.slice(0, 40);
+
+const ticker = document.getElementById("ticker");
+ticker.style.setProperty("--pink", color);
+ticker.style.setProperty("--size", size + "px");
+ticker.style.setProperty("--speed", speed + "s");
+</script>
+</body>
+</html>
