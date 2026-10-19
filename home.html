@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ゆめかわ♡動くテロップ設定</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:24px;background:#fff0f7;color:#56334d;font-family:Arial,sans-serif}
+main{max-width:680px;margin:auto;background:#fff;border:2px solid #ffc2df;border-radius:22px;padding:24px;box-shadow:0 8px 25px #e9a5ca55}
+h1{text-align:center;color:#e45a9b;font-size:25px}
+label{display:block;font-weight:bold;margin-top:18px}
+input,select{width:100%;padding:12px;margin-top:7px;border:1px solid #e9a6c9;border-radius:10px;font-size:16px}
+button{border:0;border-radius:12px;background:#e85a9d;color:white;font-weight:bold;padding:13px 18px;margin-top:18px;cursor:pointer}
+.preview{margin-top:24px;overflow:hidden;border:1px solid #f2a8cf;border-radius:12px;background:#fff7fc;padding:12px}
+.ticker{display:flex;align-items:center;gap:14px;white-space:nowrap;overflow:hidden;background-color:#ffd9ec;background-image:linear-gradient(45deg,#ffffff80 25%,transparent 25%,transparent 75%,#ffffff80 75%),linear-gradient(45deg,#ffffff80 25%,transparent 25%,transparent 75%,#ffffff80 75%);background-size:24px 24px;background-position:0 0,12px 12px;padding:12px}
+.tag{background:#e85a9d;color:white;border-radius:8px;padding:5px 10px;font-weight:bold}
+.message{font-weight:bold;animation:scroll 12s linear infinite}
+@keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+#result{overflow-wrap:anywhere;margin-top:16px}
+</style>
+</head>
+<body>
+<main>
+<h1>♡ ゆめかわ動くテロップ ♡</h1>
+<p>文字や色を設定して、OBSで使えるテロップURLを作ろう！</p>
+
+<label for="message">流したいメッセージ</label>
+<input id="message" value="コメントありがとう♡ チャンネル登録よろしくね！">
+
+<label for="tag">左側のラベル</label>
+<input id="tag" value="お知らせ♡">
+
+<label for="size">文字サイズ</label>
+<select id="size">
+<option value="20">小さめ</option>
+<option value="28" selected>ふつう</option>
+<option value="36">大きめ</option>
+<option value="44">特大</option>
+</select>
+
+<label for="color">チェック柄の色</label>
+<select id="color">
+<option value="pink">ピンク</option>
+<option value="purple">むらさき</option>
+<option value="blue">水色</option>
+<option value="black">黒</option>
+</select>
+
+<label for="speed">流れる速さ</label>
+<select id="speed">
+<option value="20">ゆっくり</option>
+<option value="12" selected>ふつう</option>
+<option value="7">速め</option>
+<option value="4">とても速い</option>
+</select>
+
+<div class="preview">
+<strong>プレビュー</strong>
+<div class="ticker" id="preview">
+<span class="tag" id="previewTag">お知らせ♡</span>
+<span class="message" id="previewMessage">コメントありがとう♡ チャンネル登録よろしくね！</span>
+</div>
+</div>
+
+<button id="make">OBS用URLを作成</button>
+<div id="result"></div>
+<button id="copy" hidden>URLをコピー</button>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let urlToCopy="";
+function update(){
+$("previewTag").textContent=$("tag").value;
+$("previewMessage").textContent=$("message").value;
+$("previewMessage").style.fontSize=$("size").value+"px";
+$("previewMessage").style.animationDuration=$("speed").value+"s";
+const colors={pink:["#ffd9ec","#fff"],purple:["#e5d7ff","#fff"],blue:["#d7f2ff","#fff"],black:["#333","#777"]};
+const c=colors[$("color").value];
+$("preview").style.backgroundColor=c[0];
+$("preview").style.backgroundImage=`linear-gradient(45deg,${c[1]}80 25%,transparent 25%,transparent 75%,${c[1]}80 75%),linear-gradient(45deg,${c[1]}80 25%,transparent 25%,transparent 75%,${c[1]}80 75%)`;
+$("preview").style.backgroundSize="24px 24px";
+$("preview").style.backgroundPosition="0 0,12px 12px";
+}
+["message","tag","size","color","speed"].forEach(id=>$(id).addEventListener("input",update));
+$("make").addEventListener("click",()=>{
+const p=new URLSearchParams({text:$("message").value,label:$("tag").value,size:$("size").value,color:$("color").value,speed:$("speed").value});
+urlToCopy=location.origin+location.pathname.replace(/\/$/,"").replace(/index\.html$/,"")+"/ticker.html?"+p.toString();
+$("result").innerHTML="";
+const a=document.createElement("a");a.href=urlToCopy;a.textContent=urlToCopy;a.target="_blank";a.rel="noopener";
+$("result").append("作成したURL：",a);
+$("copy").hidden=false;
+});
+$("copy").addEventListener("click",async()=>{
+try{await navigator.clipboard.writeText(urlToCopy);$("copy").textContent="コピーしました！";}
+catch(e){$("result").textContent="URLを選択して手動でコピーしてね："+urlToCopy;}
+});
+update();
+</script>
+</body>
+</html>
